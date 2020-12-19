@@ -16,7 +16,7 @@ resource "aws_vpc" "prod" {
   cidr_block = "10.0.0.0/16"
   
   tags = {
-    Site = "test-web-site"
+    Site = "initial-web-site"
     Name = "prod-vpc"
   }
 }
