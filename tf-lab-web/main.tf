@@ -126,12 +126,10 @@ resource "aws_instance" "web1" {
   instance_type = "t2.micro"
   # subnet_id = aws_subnet.public1.id
   key_name="tf-lab"
-
   network_interface {
      device_index         = 0
      network_interface_id = aws_network_interface.eni0.id
   }
-
   user_data = <<-EOF
 		#!/bin/bash
     sudo apt-get update
@@ -140,7 +138,6 @@ resource "aws_instance" "web1" {
 		sudo systemctl enable apache2
 		echo "<h1>Deployed via Terraform</h1>" | sudo tee /var/www/html/index.html
 	EOF
-
   tags = {
     Name = "web1_instance_in_prod_vpc"
     Env = "test"
