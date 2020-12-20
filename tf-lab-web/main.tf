@@ -49,7 +49,7 @@ resource "aws_route_table" "r1" {
 resource "aws_subnet" "public1" {
   vpc_id     = aws_vpc.prod.id
   cidr_block = "10.0.1.0/24"
-  availability-zone = "us-west-2a"
+  availability_zone = "us-west-2a"
   tags = {
     Name = "public1"
     AZ = "us-west-2a"
@@ -116,7 +116,7 @@ resource "aws_network_interface" "eni0" {
 #8  Assign elastic IP to ENI in Step 7
 resource "aws_eip" "public1_web1" {
   vpc = true
-  instance                  = aws_instance.web1.id
+  network_interface         = aws_network_interface.eni0.id
   depends_on                = [aws_internet_gateway.gw1]
 }
 
@@ -124,10 +124,16 @@ resource "aws_eip" "public1_web1" {
 resource "aws_instance" "web1" {
   ami           = var.amis[var.region]
   instance_type = "t2.micro"
-  subnet_id = aws_subnet.public1.id
-  key_name="tf-lab.pem"
-  user_data = << EOF
-		#! /bin/bash
+  # subnet_id = aws_subnet.public1.id
+  key_name="tf-lab"
+
+  network_interface {
+     device_index         = 0
+     network_interface_id = aws_network_interface.eni0.id
+  }
+
+  user_data = <<-EOF
+		#!/bin/bash
     sudo apt-get update
 		sudo apt-get install -y apache2
 		sudo systemctl start apache2
