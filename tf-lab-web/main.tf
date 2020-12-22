@@ -14,9 +14,9 @@ provider "aws" {
 
 #1  Create VPC
 resource "aws_vpc" "prod" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
     tags = {
-    Site = "web1"
+    Site = "web"
     Name = "prod-vpc"
   }
 }
@@ -48,11 +48,11 @@ resource "aws_route_table" "r1" {
 #4  Create a subnet
 resource "aws_subnet" "public1" {
   vpc_id     = aws_vpc.prod.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-west-2a"
+  cidr_block = var.subnet1_cidr
+  availability_zone = var.subnet1_az
   tags = {
-    Name = "public1"
-    AZ = "us-west-2a"
+    Name = "subnet1.public"
+    AZ = var.subnet1_az
   }
 }
 
@@ -70,15 +70,15 @@ resource "aws_security_group" "web" {
 
   ingress {
     description = "TLS from internet"
-    from_port   = 443
-    to_port     = 443
+    from_port   = var.web_server_ssl_port
+    to_port     = var.web_server_ssl_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
     description = "web from internet"
-    from_port   = 80
-    to_port     = 80
+    from_port   = var.web_server_port
+    to_port     = var.web_server_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -147,4 +147,12 @@ resource "aws_instance" "web1" {
 
 output "server_public_ip" {
    value = aws_eip.public1_web1.public_ip
+}
+
+output "web_server_port" {
+   value = var.web_server_port
+}
+
+output "web_server_ssl_port" {
+   value = var.web_server_ssl_port
 }
